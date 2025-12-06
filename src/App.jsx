@@ -9,7 +9,24 @@ const NPDSimulation = () => {
   const [currentTactic, setCurrentTactic] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
   const [completedScenarios, setCompletedScenarios] = useState([]);
+  const [showTipModal, setShowTipModal] = useState(false);
   const messagesEndRef = useRef(null);
+
+  // HandCash tip configuration
+  const HANDCASH_HANDLE = '$zcool';
+  const tipAmounts = [
+    { amount: 0.25, label: '$0.25', emoji: '☕' },
+    { amount: 1, label: '$1', emoji: '🙏' },
+    { amount: 5, label: '$5', emoji: '💪' },
+    { amount: 10, label: '$10', emoji: '🔥' },
+  ];
+
+  const handleTip = (amount) => {
+    // HandCash pay link format
+    const payLink = `https://handcash.io/pay/${HANDCASH_HANDLE.replace('$', '')}?amount=${amount}&currency=USD&note=NPD%20Pattern%20Recognition%20-%20Thank%20you!`;
+    window.open(payLink, '_blank');
+    setShowTipModal(false);
+  };
 
   const tactics = {
     darvo: {
@@ -529,7 +546,136 @@ const NPDSimulation = () => {
           border-color: #52525b;
           transform: translateX(4px);
         }
+        
+        .tip-btn:hover {
+          background: #15803d !important;
+          transform: scale(1.02);
+        }
+        
+        .tip-amount-btn {
+          transition: all 0.2s ease;
+        }
+        .tip-amount-btn:hover {
+          transform: scale(1.05);
+          filter: brightness(1.1);
+        }
       `}</style>
+
+      {/* Tip Modal */}
+      {showTipModal && (
+        <div 
+          onClick={() => setShowTipModal(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#18181b',
+              border: '1px solid #27272a',
+              borderRadius: '16px',
+              padding: '32px',
+              maxWidth: '400px',
+              width: '100%',
+              animation: 'fadeIn 0.2s ease-out'
+            }}
+          >
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <div style={{ fontSize: '48px', marginBottom: '12px' }}>💚</div>
+              <h3 style={{ 
+                fontSize: '22px', 
+                fontWeight: 500, 
+                marginBottom: '8px',
+                letterSpacing: '-0.02em'
+              }}>
+                Support This Project
+              </h3>
+              <p style={{ 
+                fontSize: '14px', 
+                color: '#71717a',
+                lineHeight: 1.6
+              }}>
+                If this helped you recognize patterns and protect yourself, consider leaving a tip via HandCash.
+              </p>
+            </div>
+            
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(2, 1fr)', 
+              gap: '12px',
+              marginBottom: '20px'
+            }}>
+              {tipAmounts.map((tip) => (
+                <button
+                  key={tip.amount}
+                  className="tip-amount-btn"
+                  onClick={() => handleTip(tip.amount)}
+                  style={{
+                    padding: '16px',
+                    backgroundColor: '#27272a',
+                    border: '1px solid #3f3f46',
+                    borderRadius: '12px',
+                    color: '#e4e4e7',
+                    fontSize: '16px',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <span style={{ fontSize: '24px' }}>{tip.emoji}</span>
+                  <span style={{ fontWeight: 500 }}>{tip.label}</span>
+                </button>
+              ))}
+            </div>
+            
+            <div style={{
+              textAlign: 'center',
+              padding: '12px',
+              backgroundColor: '#0f0f10',
+              borderRadius: '8px',
+              marginBottom: '16px'
+            }}>
+              <span style={{ fontSize: '13px', color: '#71717a' }}>Sending to </span>
+              <span style={{ 
+                fontSize: '14px', 
+                color: '#16a34a', 
+                fontWeight: 600,
+                fontFamily: "'IBM Plex Mono', monospace"
+              }}>
+                {HANDCASH_HANDLE}
+              </span>
+            </div>
+            
+            <button
+              onClick={() => setShowTipModal(false)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                backgroundColor: 'transparent',
+                border: '1px solid #3f3f46',
+                borderRadius: '8px',
+                color: '#71717a',
+                fontSize: '14px',
+                cursor: 'pointer',
+                fontFamily: 'inherit'
+              }}
+            >
+              Maybe later
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <header style={{
@@ -558,21 +704,43 @@ const NPDSimulation = () => {
           </h1>
         </div>
         
-        <button
-          onClick={() => setShowTacticPanel(!showTacticPanel)}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: 'transparent',
-            border: '1px solid #3f3f46',
-            borderRadius: '6px',
-            color: '#a1a1aa',
-            fontSize: '13px',
-            cursor: 'pointer',
-            fontFamily: 'inherit'
-          }}
-        >
-          {showTacticPanel ? 'Hide' : 'Show'} Analysis Panel
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => setShowTipModal(true)}
+            className="tip-btn"
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#16a34a',
+              border: 'none',
+              borderRadius: '6px',
+              color: 'white',
+              fontSize: '13px',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              fontWeight: 500,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <span>💚</span> Support
+          </button>
+          <button
+            onClick={() => setShowTacticPanel(!showTacticPanel)}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: 'transparent',
+              border: '1px solid #3f3f46',
+              borderRadius: '6px',
+              color: '#a1a1aa',
+              fontSize: '13px',
+              cursor: 'pointer',
+              fontFamily: 'inherit'
+            }}
+          >
+            {showTacticPanel ? 'Hide' : 'Show'} Analysis Panel
+          </button>
+        </div>
       </header>
 
       {/* Main Content */}
